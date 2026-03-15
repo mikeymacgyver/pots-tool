@@ -316,6 +316,14 @@
         <span class="f-badge neutral" id="fb-pol">–</span>
       </div>
 
+      <div class="factor-card neutral" id="fc-uv">
+        <span class="f-icon">☀️</span>
+        <div class="f-label">UV Index</div>
+        <div class="f-value" id="fv-uv">–</div>
+        <div class="f-sub"  id="fs-uv">WHO UV Index</div>
+        <span class="f-badge neutral" id="fb-uv">–</span>
+      </div>
+
     </div><!-- /grid -->
 
     <div class="footer">
@@ -370,6 +378,13 @@ function riskAQI(a) {
   if (a > 100) return 'red';   // Unhealthy for Sensitive Groups threshold
   if (a > 50)  return 'yellow';
   return 'green';
+}
+
+function riskUV(uv) {
+  if (uv === null || uv === undefined) return null;
+  if (uv >= 6) return 'red';    // High → Extreme: sun exposure compounds heat risk
+  if (uv >= 3) return 'yellow'; // Moderate: caution outdoors
+  return 'green';               // Low (0–2)
 }
 
 function riskPollen(upi) {
@@ -429,6 +444,15 @@ const aqiLabel = a => {
 
 const UPI_LABEL = ['None', 'Very Low', 'Low', 'Moderate', 'High', 'Very High'];
 
+const uvLabel = uv => {
+  if (uv === null) return 'No data';
+  if (uv <= 2)  return 'Low';
+  if (uv <= 5)  return 'Moderate';
+  if (uv <= 7)  return 'High';
+  if (uv <= 10) return 'Very High';
+  return 'Extreme';
+};
+
 const pressureTrend = (current, prev) => {
   const d = current - prev;
   if (d < -3) return '↓↓ Falling rapidly';
@@ -482,7 +506,7 @@ async function fetchEnvironmental(lat, lon) {
     fetch(
       `https://api.open-meteo.com/v1/forecast` +
       `?latitude=${lat}&longitude=${lon}` +
-      `&current=temperature_2m,apparent_temperature,relative_humidity_2m,surface_pressure` +
+      `&current=temperature_2m,apparent_temperature,relative_humidity_2m,surface_pressure,uv_index` +
       `&hourly=surface_pressure&past_hours=6&forecast_days=1&timezone=auto`
     ),
     fetch(
@@ -539,6 +563,10 @@ async function load(location) {
   const pRisk   = riskPressure(curP, prevP);
   const pTrend  = pressureTrend(curP, prevP);
 
+  // ── UV Index ───────────────────────────────────
+  const uvVal = cur.uv_index ?? null;
+  const uvRisk = riskUV(uvVal);
+
   // ── AQI ────────────────────────────────────────
   const aqiVal = (air.current?.us_aqi !== undefined && air.current?.us_aqi !== null)
     ? air.current.us_aqi
@@ -561,7 +589,7 @@ async function load(location) {
   const polRisk = riskPollen(maxUPI);
 
   // ── Overall ────────────────────────────────────
-  const overall = overallRisk([tRisk, hRisk, pRisk, aRisk, polRisk]);
+  const overall = overallRisk([tRisk, hRisk, pRisk, uvRisk, aRisk, polRisk]);
 
   // ── Update DOM ─────────────────────────────────
 
@@ -598,6 +626,12 @@ async function load(location) {
     setCard('pol', polRisk, String(maxUPI), `${sub} · UPI 0–5`);
   } else {
     setCard('pol', null, 'N/A', 'No regional data', 'Unavailable');
+  }
+
+  if (uvVal !== null) {
+    setCard('uv', uvRisk, uvVal.toFixed(1), uvLabel(uvVal));
+  } else {
+    setCard('uv', null, 'N/A', 'Data unavailable', 'Unavailable');
   }
 
   $('loader').classList.remove('show');
