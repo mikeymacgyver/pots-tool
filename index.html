@@ -47,19 +47,6 @@
     }
     .header p { font-size: 13px; color: var(--text-2); margin-top: 5px; }
 
-    /* ── Disclaimer ──────────────────────────────── */
-    .disclaimer {
-      background: #FFFBEF;
-      border: 1px solid #E8D596;
-      border-radius: var(--radius-sm);
-      padding: 11px 14px;
-      font-size: 12px;
-      color: #7A6418;
-      line-height: 1.6;
-      margin-bottom: 18px;
-    }
-    .disclaimer strong { color: #5A4A10; }
-
     /* ── Search ──────────────────────────────────── */
     .search-wrap { position: relative; margin-bottom: 18px; }
     .search-input {
@@ -235,12 +222,6 @@
     <p>See how today's conditions may relate to your POTS symptoms</p>
   </div>
 
-  <div class="disclaimer">
-    <strong>Educational resource only.</strong> This tool provides general environmental information
-    and does not constitute medical advice, a clinical assessment, or a diagnosis. Always follow the
-    management plan from your treating health professionals.
-  </div>
-
   <div class="search-wrap">
     <input
       type="text"
@@ -272,8 +253,6 @@
       <p class="recommendation" id="recommendation"></p>
     </div>
 
-    <div class="timestamp" id="timestamp"></div>
-
     <div class="grid">
 
       <div class="factor-card neutral" id="fc-temp">
@@ -293,7 +272,7 @@
       </div>
 
       <div class="factor-card neutral" id="fc-pres">
-        <span class="f-icon">📊</span>
+        <span class="f-icon">📈</span>
         <div class="f-label">Pressure</div>
         <div class="f-value" id="fv-pres">–</div>
         <div class="f-sub"  id="fs-pres">hPa</div>
@@ -301,7 +280,7 @@
       </div>
 
       <div class="factor-card neutral" id="fc-aqi">
-        <span class="f-icon">🌫️</span>
+        <span class="f-icon">💨</span>
         <div class="f-label">Air Quality</div>
         <div class="f-value" id="fv-aqi">–</div>
         <div class="f-sub"  id="fs-aqi">US AQI</div>
@@ -326,11 +305,14 @@
 
     </div><!-- /grid -->
 
+    <div class="timestamp" id="timestamp"></div>
+
     <div class="footer">
-      This tool is for educational purposes only and does not constitute medical advice or a clinical diagnosis.<br>
-      Consult your medical team for personalised POTS management strategies.<br>
+      <strong>Educational resource only.</strong> This tool provides general environmental information and does not
+      constitute medical advice, a clinical assessment, or a diagnosis. Always follow the management plan from your
+      treating health professionals.<br><br>
       Environmental data sourced from <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a>
-      (open-source, free). No personal data is collected or stored.
+      &amp; Google Pollen API. No personal data is collected or stored.
     </div>
 
   </div><!-- /results -->
