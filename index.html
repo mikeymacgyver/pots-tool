@@ -312,7 +312,7 @@
         <span class="f-icon">🌿</span>
         <div class="f-label">Pollen</div>
         <div class="f-value" id="fv-pol">–</div>
-        <div class="f-sub"  id="fs-pol">grains/m³</div>
+        <div class="f-sub"  id="fs-pol">Universal Pollen Index</div>
         <span class="f-badge neutral" id="fb-pol">–</span>
       </div>
 
@@ -330,7 +330,7 @@
 <script>
 // ─────────────────────────────────────────────────────────────────────────────
 // POTS Environmental Wellness Check
-// APIs: Open-Meteo (geocoding, weather, air quality) — no API key required
+// APIs: Open-Meteo (geocoding, weather, AQI) · Google Pollen API (pollen)
 // Compliance: Educational framing per AHPRA/APS guidelines
 // Privacy: No names, emails, or health data collected. Session-only.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -338,6 +338,9 @@
 const $ = id => document.getElementById(id);
 let debounceTimer;
 let geoResults = [];
+
+// ── API key (restrict to your domains in Google Cloud Console) ────────────────
+const GOOGLE_POLLEN_KEY = 'AIzaSyDPMZ0xmsEZuWEK-alwkG38quCzRCW9b34';
 
 // ── Risk thresholds (evidence-based for POTS) ─────────────────────────────────
 
@@ -369,10 +372,11 @@ function riskAQI(a) {
   return 'green';
 }
 
-function riskPollen(p) {
-  if (p === null || p === undefined) return null;
-  if (p > 50) return 'red';
-  if (p > 10) return 'yellow';
+function riskPollen(upi) {
+  // Google UPI scale: 0=None, 1=Very Low, 2=Low, 3=Moderate, 4=High, 5=Very High
+  if (upi === null || upi === undefined) return null;
+  if (upi >= 4) return 'red';
+  if (upi >= 2) return 'yellow';
   return 'green';
 }
 
@@ -423,12 +427,7 @@ const aqiLabel = a => {
   return 'Hazardous';
 };
 
-const pollenLabel = p => {
-  if (p === null) return 'No regional data';
-  if (p < 10) return 'Low · grains/m³';
-  if (p < 50) return 'Moderate · grains/m³';
-  return 'High · grains/m³';
-};
+const UPI_LABEL = ['None', 'Very Low', 'Low', 'Moderate', 'High', 'Very High'];
 
 const pressureTrend = (current, prev) => {
   const d = current - prev;
@@ -479,7 +478,7 @@ async function geocode(query) {
 }
 
 async function fetchEnvironmental(lat, lon) {
-  const [wRes, aRes] = await Promise.all([
+  const [wRes, aRes, pRes] = await Promise.all([
     fetch(
       `https://api.open-meteo.com/v1/forecast` +
       `?latitude=${lat}&longitude=${lon}` +
@@ -489,13 +488,18 @@ async function fetchEnvironmental(lat, lon) {
     fetch(
       `https://air-quality-api.open-meteo.com/v1/air-quality` +
       `?latitude=${lat}&longitude=${lon}` +
-      `&current=us_aqi` +
-      `&hourly=birch_pollen,grass_pollen,mugwort_pollen,ragweed_pollen` +
-      `&forecast_days=1&timezone=auto`
+      `&current=us_aqi&forecast_days=1&timezone=auto`
     ),
+    // Google Pollen API — gracefully returns null if region not covered
+    fetch(
+      `https://pollen.googleapis.com/v1/forecast:lookup` +
+      `?key=${GOOGLE_POLLEN_KEY}` +
+      `&location.latitude=${lat}&location.longitude=${lon}&days=1`
+    ).catch(() => null),
   ]);
   if (!wRes.ok || !aRes.ok) throw new Error('API error');
-  return Promise.all([wRes.json(), aRes.json()]);
+  const pollenJson = (pRes && pRes.ok) ? await pRes.json() : null;
+  return [await wRes.json(), await aRes.json(), pollenJson];
 }
 
 // ── Render results ────────────────────────────────────────────────────────────
@@ -505,9 +509,9 @@ async function load(location) {
   $('results').classList.remove('show');
   $('loader').classList.add('show');
 
-  let weather, air;
+  let weather, air, pollenData;
   try {
-    [weather, air] = await fetchEnvironmental(location.lat, location.lon);
+    [weather, air, pollenData] = await fetchEnvironmental(location.lat, location.lon);
   } catch (e) {
     showError('Unable to fetch environmental data. Please check your connection and try again.');
     return;
@@ -541,16 +545,20 @@ async function load(location) {
     : null;
   const aRisk = riskAQI(aqiVal);
 
-  // ── Pollen (today's peak across all types) ─────
-  const hr = air.hourly ?? {};
-  const pollenAll = [
-    ...(hr.birch_pollen ?? []),
-    ...(hr.grass_pollen ?? []),
-    ...(hr.mugwort_pollen  ?? []),
-    ...(hr.ragweed_pollen  ?? []),
-  ].filter(v => v !== null && v !== undefined && !isNaN(v));
-  const maxPollen = pollenAll.length > 0 ? Math.max(...pollenAll) : null;
-  const polRisk   = riskPollen(maxPollen);
+  // ── Pollen (Google Pollen API – UPI 0–5) ──────
+  let maxUPI = null;
+  let dominantType = null;
+  const todayPollen = pollenData?.dailyInfo?.[0];
+  if (todayPollen?.pollenTypeInfo) {
+    for (const type of todayPollen.pollenTypeInfo) {
+      const upi = type.indexInfo?.value ?? null;
+      if (upi !== null && (maxUPI === null || upi > maxUPI)) {
+        maxUPI = upi;
+        dominantType = type.displayName;
+      }
+    }
+  }
+  const polRisk = riskPollen(maxUPI);
 
   // ── Overall ────────────────────────────────────
   const overall = overallRisk([tRisk, hRisk, pRisk, aRisk, polRisk]);
@@ -584,9 +592,10 @@ async function load(location) {
     setCard('aqi', null, 'N/A', 'Data unavailable', 'Unavailable');
   }
 
-  if (maxPollen !== null) {
-    const polDisp = maxPollen < 1 ? '< 1' : String(Math.round(maxPollen));
-    setCard('pol', polRisk, polDisp, pollenLabel(maxPollen));
+  if (maxUPI !== null) {
+    const cat = UPI_LABEL[maxUPI] ?? 'Unknown';
+    const sub = dominantType ? `${cat} · ${dominantType}` : cat;
+    setCard('pol', polRisk, String(maxUPI), `${sub} · UPI 0–5`);
   } else {
     setCard('pol', null, 'N/A', 'No regional data', 'Unavailable');
   }
