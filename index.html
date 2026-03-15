@@ -480,10 +480,14 @@ function clearError() {
 async function geocode(query) {
   const url =
     `https://geocoding-api.open-meteo.com/v1/search` +
-    `?name=${encodeURIComponent(query)}&count=5&language=en&format=json`;
+    `?name=${encodeURIComponent(query)}&count=10&language=en&format=json`;
   const res = await fetch(url);
   const data = await res.json();
-  return data.results ?? [];
+  const results = data.results ?? [];
+  // Prioritise Australian results while keeping global fallback
+  const au   = results.filter(r => r.country_code === 'AU');
+  const rest = results.filter(r => r.country_code !== 'AU');
+  return [...au, ...rest].slice(0, 5);
 }
 
 async function fetchEnvironmental(lat, lon) {
