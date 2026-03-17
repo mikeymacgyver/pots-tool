@@ -414,7 +414,7 @@ remain important regardless of environmental conditions.</p>`,
 
   yellow: `<p>Current conditions show elevated triggers (e.g., rising humidity or moderate pollen). Your nervous system may be working harder than usual today.</p>
 
-<strong>Key Coping Strategies:</strong>
+<p><strong>Key Coping Strategies:</strong>
 <ul>
   <li><strong>Pre-emptive Hydration:</strong> Add an extra 500ml of electrolyte-rich fluid to your morning routine.</li>
   <li><strong>Strategic Cooling:</strong> Use a cooling neck towel or a small portable fan if you are moving between indoor and outdoor environments.</li>
@@ -425,11 +425,11 @@ remain important regardless of environmental conditions.</p>`,
 <ul>
   <li><a href="https://www.potsuk.org/managingpots/managing-fatigue/" target="_blank" rel="noopener">Managing POTS Fatigue</a></li>
   <li><a href="https://potsfoundation.org.au/" target="_blank" rel="noopener">POTS-Friendly Salt Recipes (Australian POTS Foundation)</a></li>
-</ul>`,
+</ul></p>`,
 
   red: `<p>Current conditions are highly likely to challenge your autonomic nervous system. This is a day to prioritise <strong>pacing</strong> and <strong>physical safety</strong></p>.
 
-<strong>Key Coping Strategies:</strong>
+<p><strong>Key Coping Strategies:</strong>
 <ul>
   <li><strong>Climate Control:</strong> Remain in air-conditioning if possible. Heat causes vasodilation, which worsens POTS symptoms.</li>
   <li><strong>Horizontal Rest:</strong> If you feel "pre-syncope" (dizzy/faint), lie down with your legs elevated above your heart to assist blood flow to the brain.</li>
@@ -441,7 +441,7 @@ remain important regardless of environmental conditions.</p>`,
 <ul>
   <li><strong>Emergency Action:</strong> <a href="https://www.healthdirect.gov.au/" target="_blank" rel="noopener">When to call 000</a></li>
   <li><a href="https://potsfoundation.org.au/" target="_blank" rel="noopener">Managing a POTS Flare</a></li>
-</ul>`,
+</ul></p>`,
 };
 
 const aqiLabel = a => {
@@ -510,10 +510,7 @@ async function geocode(query) {
   const res = await fetch(url);
   const data = await res.json();
   const results = data.results ?? [];
-  // Prioritise Australian results while keeping global fallback
-  const au   = results.filter(r => r.country_code === 'AU');
-  const rest = results.filter(r => r.country_code !== 'AU');
-  return [...au, ...rest].slice(0, 5);
+  return results.filter(r => r.country_code === 'AU').slice(0, 5);
 }
 
 async function fetchEnvironmental(lat, lon) {
