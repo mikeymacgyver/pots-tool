@@ -224,7 +224,7 @@
 
   <div class="header">
     <h1>POTS Environmental Wellness Check</h1>
-    <p>See how today's conditions may relate to your POTS symptoms</p>
+    <p>See how today's current conditions may relate to your POTs symptoms. All inputs are updated hourly, so feel free to keep checking in throughout the day.</p>
   </div>
 
   <div class="search-wrap">
@@ -232,7 +232,7 @@
       type="text"
       class="search-input"
       id="searchInput"
-      placeholder="Enter your city or postcode…"
+      placeholder="Enter your city"
       autocomplete="off"
       spellcheck="false"
       aria-label="Search for a location"
@@ -244,7 +244,7 @@
 
   <div class="loader" id="loader" aria-live="polite">
     <div class="loader-ring"></div>
-    <p>Fetching environmental data…</p>
+    <p>Currently, today’s conditions...</p>
   </div>
 
   <div class="results" id="results" aria-live="polite">
@@ -255,7 +255,7 @@
         <div class="status-dot"></div>
         <span id="statusText"></span>
       </div>
-      <p class="recommendation" id="recommendation"></p>
+      <div class="recommendation" id="recommendation"></div>
     </div>
 
     <div class="grid">
@@ -311,12 +311,17 @@
     </div><!-- /grid -->
 
     <div class="timestamp" id="timestamp"></div>
-
-    <div class="footer">
-      <strong>Educational resource only.</strong> This tool provides general environmental information and does not
-      constitute medical advice, a clinical assessment, or a diagnosis. Always follow the management plan from your
-      treating health professionals.<br>Environmental data sourced from <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a>
-      &amp; Google Pollen API. No personal data is collected or stored.
+    
+    <div class=”footer”>
+      POTS Pilot is a psycho-educational tool created by Northground. It calculates environmental risk based on public data from Google Pollen API and <a href=”https://open-meteo.com” target=”_blank” rel=”noopener”>Open-Meteo</a>. This tool does not diagnose medical conditions or monitor physiological vitals. Please consult your medical team for medical management.<br /><em>If you are experiencing chest pain, fainting, or severe shortness of breath, please contact your GP or call 000.</em>
+      <br /><br />
+      <strong>For more tips and ideas on how to support yourself, please see the following resources:</strong>
+      <ul>
+        <li><strong>Australian POTS Foundation:</strong> <a href=”https://potsfoundation.org.au/living-with-pots/” target=”_blank” rel=”noopener”>Living with POTS</a></li>
+        <li><strong>Government Health Advice:</strong> <a href=”https://www.healthdirect.gov.au/postural-orthostatic-tachycardia-syndrome-pots” target=”_blank” rel=”noopener”>Healthdirect’s POTS Management</a></li>
+        <li><strong>The “GP Resource Sheet”:</strong> <a href=”https://potsfoundation.org.au/wp-content/uploads/2025/08/GP-Resource-Sheet-2025.pdf” target=”_blank” rel=”noopener”>Download PDF</a> — take to your GP or medical team if you’re experiencing a flare</li>
+        <li><strong>Northground – Navigating POTS:</strong> <a href=”https://www.thenorthground.com/pots-medical-somatic-management” target=”_blank” rel=”noopener”>thenorthground.com</a></li>
+      </ul>
     </div>
   </div><!-- /results -->
 
@@ -398,7 +403,7 @@ const BADGE = {
 
 const STATUS_LABEL = {
   green:  'Conditions Look Manageable',
-  yellow: 'Moderate Conditions Today',
+  yellow: 'Moderate Environmental Risk',
   red:    'Challenging Conditions Today',
 };
 
@@ -407,15 +412,36 @@ const RECOMMENDATIONS = {
 strategies — consistent hydration, salt intake as prescribed, and gradual position changes
 remain important regardless of environmental conditions.`,
 
-  yellow: `Some environmental triggers are present today. If going outdoors, allow time to
-acclimatise gradually and consider a cooling vest or damp towel to help regulate body
-temperature. Monitor how you are feeling and rest as needed. Your usual management
-strategies remain important.`,
+  yellow: `Current conditions show elevated triggers (e.g., rising humidity or moderate pollen). Your nervous system may be working harder than usual today.
 
-  red: `Conditions today may be particularly challenging for POTS management. Consider staying
-in a cool, climate-controlled environment where possible. Prioritise your prescribed fluid
-and salt intake, and if you do go outdoors, waist-high compression garments may help
-minimise blood pooling. Avoid prolonged standing and plan rest periods.`,
+<strong>Key Coping Strategies:</strong>
+<ul>
+  <li><strong>Pre-emptive Hydration:</strong> Add an extra 500ml of electrolyte-rich fluid to your morning routine.</li>
+  <li><strong>Strategic Cooling:</strong> Use a cooling neck towel or a small portable fan if you are moving between indoor and outdoor environments.</li>
+  <li><strong>Monitor Transitions:</strong> Be extra cautious when moving from sitting to standing; take an extra 10 seconds to pause at the edge of the chair.</li>
+  <li><strong>Lower the "Pacing" Bar:</strong> If you had a heavy workout or a long walk planned, consider a lower-impact version (e.g., floor-based stretches or swimming).</li>
+</ul>
+<strong>Resources:</strong>
+<ul>
+  <li><a href="https://www.potsuk.org/managingpots/managing-fatigue/" target="_blank" rel="noopener">Managing POTS Fatigue</a></li>
+  <li><a href="https://potsfoundation.org.au/" target="_blank" rel="noopener">POTS-Friendly Salt Recipes (Australian POTS Foundation)</a></li>
+</ul>`,
+
+  red: `Current conditions are highly likely to challenge your autonomic nervous system. This is a day to prioritise <strong>pacing</strong> and <strong>physical safety</strong>.
+
+<strong>Key Coping Strategies:</strong>
+<ul>
+  <li><strong>Climate Control:</strong> Remain in air-conditioning if possible. Heat causes vasodilation, which worsens POTS symptoms.</li>
+  <li><strong>Horizontal Rest:</strong> If you feel "pre-syncope" (dizzy/faint), lie down with your legs elevated above your heart to assist blood flow to the brain.</li>
+  <li><strong>Hydration Audit:</strong> Increase your fluid and salt intake today (as per your medical team's guidelines). In Australia, products like LMNT or Hydralyte are common supports.</li>
+  <li><strong>Mechanical Support:</strong> Wear your highest level of medical-grade compression (e.g., waist-high) if you must stand.</li>
+  <li><strong>Emotional Pacing:</strong> It is normal to feel anxious when your heart rate spikes. Use "Box Breathing" (4 counts in, 4 hold, 4 out, 4 hold) to signal to your nervous system that you are safe.</li>
+</ul>
+<strong>Resources:</strong>
+<ul>
+  <li><strong>Emergency Action:</strong> <a href="https://www.healthdirect.gov.au/" target="_blank" rel="noopener">When to call 000</a></li>
+  <li><a href="https://potsfoundation.org.au/" target="_blank" rel="noopener">Managing a POTS Flare</a></li>
+</ul>`,
 };
 
 const aqiLabel = a => {
@@ -591,7 +617,7 @@ async function load(location) {
   const pill = $('statusPill');
   pill.className = `status-pill ${overall}`;
   $('statusText').textContent = STATUS_LABEL[overall];
-  $('recommendation').textContent = RECOMMENDATIONS[overall];
+  $('recommendation').innerHTML = RECOMMENDATIONS[overall];
 
   // Timestamp
   const now = new Date();
