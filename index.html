@@ -30,22 +30,20 @@
       --shadow:     0 1px 4px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.05);
     }
 
-    html {
-      width: 450px;
-      height: 700px;
-    }
-
     body {
       font-family: 'Inter', system-ui, -apple-system, sans-serif;
       background: var(--bg);
       color: var(--text-1);
-      padding: 24px 18px 40px;
       font-size: 14px;
       line-height: 1.5;
-      width: 450px;
-      height: 700px;
-      overflow-y: auto;
-      overflow-x: hidden;
+      width: 100%;
+      min-width: 425px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px 18px 40px;
     }
 
     /* ── Header ──────────────────────────────────── */
@@ -178,6 +176,14 @@
       gap: 10px; margin-bottom: 18px;
     }
 
+    /* ── Responsive ──────────────────────────────── */
+    @media (max-width: 520px) {
+      .container { padding: 18px 14px 32px; }
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .overall-card { padding: 20px 16px 18px; }
+      .loc-meta { font-size: 16pt; }
+    }
+
     .factor-card {
       background: var(--surface);
       border-radius: var(--radius);
@@ -230,6 +236,7 @@
   </style>
 </head>
 <body>
+<div class="container">
 
   <div class="header">
     <h1>POTS Environmental Wellness Check</h1>
@@ -328,6 +335,8 @@
       &amp; Google Pollen API. No personal data is collected or stored.<br><br>If you are experiencing chest pain, fainting, or severe shortness of breath, please contact your GP or call 000.
     </div>
   </div><!-- /results -->
+
+</div><!-- /container -->
 
 <script>
 // ─────────────────────────────────────────────────────────────────────────────
