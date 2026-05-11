@@ -80,13 +80,12 @@
     /* ── Autocomplete dropdown ───────────────────── */
     .dropdown {
       display: none;
-      position: absolute;
-      top: calc(100% + 6px); left: 0; right: 0;
+      position: fixed;
       background: var(--surface);
       border: 1.5px solid var(--border);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      z-index: 1000; overflow: hidden;
+      z-index: 10000; overflow: hidden;
     }
     .dropdown.open { display: block; }
     .dd-item {
@@ -662,8 +661,18 @@ function notifyHeight() {
 
 // ── Autocomplete ──────────────────────────────────────────────────────────────
 
+function positionDropdown() {
+  const input = $('searchInput');
+  const rect = input.getBoundingClientRect();
+  const dd = $('dropdown');
+  dd.style.top   = (rect.bottom + 6) + 'px';
+  dd.style.left  = rect.left + 'px';
+  dd.style.width = rect.width + 'px';
+}
+
 function renderDropdown(results) {
   const dd = $('dropdown');
+  positionDropdown();
   if (!results.length) {
     dd.innerHTML = '<div class="dd-empty">No results found. Try entering a city name.</div>';
     dd.classList.add('open');
