@@ -30,14 +30,17 @@
       --shadow:     0 1px 4px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.05);
     }
 
+    html, body {
+      overflow-x: hidden;
+      width: 100%;
+    }
+
     body {
       font-family: 'Inter', system-ui, -apple-system, sans-serif;
       background: var(--bg);
       color: var(--text-1);
       font-size: 14px;
       line-height: 1.5;
-      width: 100%;
-      overflow-x: hidden;
     }
 
     .container {
@@ -139,6 +142,8 @@
       margin-bottom: 14px;
       box-shadow: var(--shadow);
       text-align: center;
+      overflow: hidden;
+      max-width: 100%;
     }
     .loc-meta { font-size: 18pt; font-weight: 600; color: var(--text-1); margin-bottom: 14px; }
 
@@ -160,7 +165,8 @@
 
     .recommendation {
       font-size: 13px; color: var(--text-2);
-      line-height: 1.8; max-width: 540px; margin: 0 auto;
+      line-height: 1.8; max-width: 100%; margin: 0 auto;
+      overflow-wrap: break-word; word-break: break-word;
     }
 
     /* ── Timestamp ───────────────────────────────── */
